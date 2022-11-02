@@ -12,7 +12,14 @@ WITH BSE_TM AS
             1 AS PTR_IRT,
             36 AS ENGM_PD_MM_CNT,
             100000 AS AMT
-       FROM DUAL)
+       FROM DUAL),
+     INT_CAL_BSE_TM AS
+    (SELECT LEVEL AS SQN,
+            ADD_MONTHS(A.ACCT_NEW_DT,LEVEL-1) AS INT_RCT_DT,
+            LEAST(ADD_MONTHS(A.ACCT_NEW_DT,LEVEL),A.COC_DT) AS INT_DT,
+            ADD_MONTHS(A.ACCT_NEW_DT) AS INT_DT1
+       FROM BSE_TM A
+     CONNECT BY LEVEL <= CEIL(MONTHS_BETWEEN(A.COC_DT, A.ACCT_NEW_DT))),
 select qq
   from dual
 ```
