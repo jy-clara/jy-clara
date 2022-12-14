@@ -44,8 +44,24 @@ WITH BSE_TM AS
                                 * (CASE WHEN MONTHS_BETWEEN(B.INT_DT,B.INT_RCK_DT) >= 1 THEN 1 ELSE (B.INT_DT-B.INT_RCK_DT)/(B.INT_DT1-B.INT_RCK_DT) END))
             END AS INT_AMT
      FROM BSE_TM A, INT_CAL_BSE_TM B)
-select qq
-  from dual
+select A.ACCT_NEW_DT AS "계좌신규일자",
+       A.XRN_DT AS "만기일자",
+       A.COC_DT AS "해지일자",
+       A.ENGM_IRT AS "약정이율",
+       A.PTR_IRT AS "만기우대이율",
+       A.ENGM_PD_MM_CNT AS "약정개월수",
+       A.AMT AS "약정금액",
+       B.SQN AS "회차",
+       TO_CHAT(B.INT_RCK_DT,'YYYYMMDD') AS "이자기산일",
+       TO_CHAR(B.INT_DT,'YYYYMMDD') AS "이자일",
+       TO_CHAR(B.INT_DT1,'YYYYMMDD') AS "원래이자일",
+       C.ALY_INT_RT AS "적용이자율",
+       C.INT_AMT AS "회차이자금액",
+       SUM(C.INT_AMT) OVER (ORDER BY B.SQN) AS "누적이자금액",
+       TRUNC(TRUNC(SUM(C.INT_AMT) OVER (ORDER BY B.SQN),-3) * 15.4/100) AS "세금",
+       (SUM(C.INT_AMT) OVER (ORDER BY B.SQN)) - TRUNC(TRUNC(SUM(C.INT_AMT) OVER (ORDER BY B.SQN),-3) * 15.4/100) AS "세후이자"
+  from BSE_TM A, INT_CAL_BSE_TM B, INT_CAL_TT C
+ WHERE B.SQN = C.SQN
 ```
 
 <!---
