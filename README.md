@@ -30,6 +30,10 @@ WITH BSE_TM AS
                        WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) < 1 THEN 0.1
                        ELSE A.ENGM_IRT*0.1
                   END,2) AS ALY_INT_RT,
+            CASE WHEN A.COC_DT > A.XRN_DT THEN ROUND(A.AMT * B.SQN * (A.ENGM_IRT+A.PTR_IRT)/100 12,0)
+                 ELSE TRUNC(SUM(TRUNC(SUM(A.AMT
+                                              * ROUND(CASE WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.8 THEN A.ENGM_IRT*0.9
+                                                           WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.6 THEN A.ENGM_IRT*0.7
 select qq
   from dual
 ```
