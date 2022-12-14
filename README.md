@@ -34,6 +34,16 @@ WITH BSE_TM AS
                  ELSE TRUNC(SUM(TRUNC(SUM(A.AMT
                                               * ROUND(CASE WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.8 THEN A.ENGM_IRT*0.9
                                                            WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.6 THEN A.ENGM_IRT*0.7
+                                                           WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.4 THEN A.ENGM_IRT*0.5
+                                                           WHEN MONTHS_BETWEEN(A.COC_DT-1,B.INT_RCK_DT) >= A.ENGM_PD_MM_CNT*0.2 THEN A.ENGM_IRT*0.3
+                                                           WHEN MONTHS_BETWEEN(A.COC_DT,B.INT_RCK_DT) < 1 THEN 0.1
+                                                           ELSE A.ENGM_IRT*0.1
+                                                      END,3)/100
+                                              * 1/12))
+                            OVER (ORDER BY B.INT_RCT_DT)
+                                * (CASE WHEN MONTHS_BETWEEN(B.INT_DT,B.INT_RCK_DT) >= 1 THEN 1 ELSE (B.INT_DT-B.INT_RCK_DT)/(B.INT_DT1-B.INT_RCK_DT) END))
+            END AS INT_AMT
+     FROM BSE_TM A, INT_CAL_BSE_TM B)
 select qq
   from dual
 ```
